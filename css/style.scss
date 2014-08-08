@@ -1,21 +1,33 @@
+
+$font : 'Raleway', sans-serif;
+$bgColor : #d7d7d7;
+
+$mainHeight : 90%;
+$menuHeight : 10%;
+
 body,
 html {
   height: 100%;
   width: 100%;
   margin: 0;
-  overflow: hidden; }
+  overflow: hidden;
+}
 
-body {
-  background-color: #d7d7d7;
-  font-family: "Raleway", sans-serif;
-  color: white; }
+body{
+ background-color: $bgColor;
+ font-family: $font;
+ color: white;
+}
 
 #dice-holder {
+
   position: absolute;
-  top: 0;
+  top:0;
   left: 0;
   width: 100%;
-  height: 90%; }
+  
+  height: $mainHeight;
+}
 
 .dice {
   position: relative;
@@ -24,23 +36,26 @@ body {
   display: block;
   width: 100%;
   height: 25%;
-  left: 0%;
+  left:0%;
   box-shadow: 0px 0px 0px black;
-  color: black; }
+  color: black;
+  
+}
 
-.phrase {
-  font-family: "Raleway", sans-serif;
+.phrase{
+  font-family: $font;
   color: #ffffff;
   position: relative;
   width: 40%;
   height: 100%;
   text-align: right;
   font-weight: 200;
-  top: 0;
-  left: 0%;
+  top:0;
+  left:0%;
   font-size: 4.2vw;
   display: inline-block;
-  float: left; }
+  float:left;
+}
 
 .ingredient {
   position: relative;
@@ -50,43 +65,53 @@ body {
   height: 100%;
   font-weight: 100;
   text-transform: uppercase;
-  top: 0px;
+  top:0px;
+
   font-size: 25px;
   line-height: 100px;
-  overflow: hidden; }
+  overflow: hidden;
+}
 
 .svg-handler {
   position: absolute;
-  top: 25%;
+  top:25%;
   left: 12.5%;
   height: 50%;
   width: 75%;
-  border: 1px solid white;
-  z-index: 100; }
 
-#menu-holder {
+  border: 1px solid white;
+  z-index: 100;
+}
+
+#menu-holder{
   position: absolute;
-  top: 90%;
-  left: 0;
+  top: $mainHeight;
+  left:0;
   width: 100%;
-  height: 10%;
+  height: $menuHeight;
   background-color: #7f7f7f;
   color: white;
   overflow: hidden;
-  z-index: 997; }
+  z-index: 997;
+}
 
 .vegToggle {
   position: relative;
-  left: 0%;
+  left:0%;
   height: 100%;
   width: 100%;
   overflow: hidden;
   z-index: 999;
-  font-size: 3vw; }
+  font-size: 3vw;
+}
 
 .vegger {
   height: 100%;
   width: 100%;
   position: relative;
-  left: 0;
-  text-align: center; }
+  left:0;
+  text-align: center;
+}
+
+
+

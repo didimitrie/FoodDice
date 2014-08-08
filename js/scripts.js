@@ -1,19 +1,19 @@
 /*jshint devel:true, unused: false, undef:false*/
 
+/*
+/////////////////////////////////////////////
+			HELPER FUNCTIONS 
+/////////////////////////////////////////////
+*/
 
 Number.prototype.map = function ( in_min , in_max , out_min , out_max ) {
   return ( this - in_min ) * ( out_max - out_min ) / ( in_max - in_min ) + out_min;
 }
 
-function randomString()
+function randomIngredient()
 {
-    var text = "";
-    var possible = "Zabcdefghi  jklmnopqrstuvwxyz ";
-
-    for( var i=0; i < 8; i++ )
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return text;
+	var words = "carrot cake polenta asparagus brocoli musli lime steam lamb pork tulips deodorant".split(' ');
+	return words[Math.floor(Math.random() * words.length)];
 }
 
 function getRandomColor() {
@@ -33,136 +33,254 @@ function getRandomColor() {
     };
 })();
 
+/*
+/////////////////////////////////////////////
+			DOC INIT FUNCTIONS 
+/////////////////////////////////////////////
+*/
+
+function setElementsHeight(){
+	var totalHeight = $("body").height();
+	var unit = totalHeight/9;
+
+	var elemNo = $(".dice").length;
+	var unitD = (totalHeight-unit)/elemNo;
+	
+	$(".dice").each(function(i) { 
+		$(this).height(unitD); 
+		$(this).css("top", i*unitD); 
+	});
+
+	$(".dice").each(function(){
+		$(this).css("background-color", getRandomColor());
+	});
+
+	$(".dice .ingredient").css("line-height", unitD+"px");
+	$(".dice .phrase").css("line-height", unitD+"px");
+	$(".dice .funny-text").css("line-height", unitD+"px");
+
+	$(".menu").height(unit*1);
+	$(".menu").css("line-height", unit*1+"px");
+	//$(".vegToggle").height(unit*1);
+	$(".vegToggle").css("line-height", unit*0.7+"px");
+
+	$(".menu").velocity({boxShadowBlur:10}, 0);
+	//$(".vegToggle").velocity({boxShadowBlur:10}, 0);
+
+	$(".svg-handler").each(function(index){
+		
+
+
+		var skewfactor = index.map(0,3, 10, 15) * (index%2==0 ? 1 : -1);
+		//$(this).velocity({rotateZ: 45}, 1);
+	});
+}
+
+
+
+var vegan = false;
+
+function changeRegime()
+{
+	$(".vegToggle").hammer().on("drag", function(e){
+		e.gesture.preventDefault();
+		
+		$(this).velocity({right: "-=" + e.gesture.deltaX.map(0, $("body").width(), 0, 50) + "%"},1)
+		//$(this).css("left", ($("body").width()*0.7 + e.gesture.deltaX) + "px");
+		$(this).velocity({opacity: Math.abs(e.gesture.deltaX).map(0,$("body").width(),1,0)}, 1);
+
+	});
+}
+
+function makeMenu()
+{
+	
+}
 
 $(document).ready(function () {
 
-	var totalHeight = $("body").height();
-	console.log(totalHeight);
+	setElementsHeight();
 
-	$(".dice").each(function(i) { $(this).height((totalHeight-0)/5); $(this).css("top", i*totalHeight/5); });
+	makeMenu();
 
-	$(".dice").each(function(){$(this).css("background-color", getRandomColor());});
+	changeRegime();
 
 	var kickOff = true;
-	var globalDrag = false;
-	var timeout = null;
-	var holding = false;
-	var touched = false;
-	var pinchin = false;
-	var pinchinKickOff = false;
-	var pinchScale = 0;
+	var kickOffUp = true;
 
-	$("body").hammer().on('pinchin', function(e){
+	var dragInProcess = false;
+	var dragUpInProcess = false;
+	var collapsedState = false;
 
-		pinchin = true;
-		if(kickOff) {
-			$(".dice").each(function(index){ $(this).css("z-index", index);});
-			var scale = pinchScale = e.gesture.scale; // goes from 1 at the beginning to around 0.2 (0) at the end of the pinchin
-			var middle = $("body").height()/2;
-			var topMiddle = middle - middle/5; // this is the top value we expect to reach with all divs
+	var sidebarOpen = false;
+	var sidebardDragLeft = false;
+	var sidebardDragRight = false;
+	var sideBarScale = 0;
+
+	//
+	// VEGETARIAN TOGGLE
+	// no interaction conflicts for now
+	//
+
+
+	//
+	// PULL TO REFRESH
+	// priority 0 in the event queue
+	//
+	$("body").hammer().on('hold', function (e) {
+		console.log("what is wrong?");
+		if(collapsedState) { 
+		 		$(".dc").velocity("fadeIn", {duration: 100, complete: function() {collapsedState = false;}});
+		 		$(".mc").velocity("fadeOut", "fast");
+		 	} 	
+	});
+
+	$(".dice").hammer().on('dragdown', function(e){
 			
-			console.log("Pinch scale: " + scale);
+			if(collapsedState) return;
 
-			$(".dice").each(function(index){
-				//$(this).velocity({left: $("body").width()/2-$(this).height()/2, top: topMiddle + index*10, scale: 0.9, width: $(this).height(), borderRadius: 100,}, {duration:600, easing: "easeInOutBack"});
-				$(this).velocity({top: topMiddle + index*10}, {duration:400, easing: "easeInOutBack", complete: function() { kickOff = false;}});
-				});
-		
-		}
-
-	}).on('release', function(){
-		
-			if(pinchin&&pinchScale>0.6) {
-				console.log("pinch released! ");
-				$(".dice").velocity("stop", true);
-				$(".dice").each(function(i){
-				$(this).velocity({left:0, width: "100%", borderRadius: 0, top: $("body").height()/5*i, scale: 1}, {complete: function() {pinchin = false;}, duration:200});
-				});
-			}
-		
-	});
-
-	$("body").hammer().on('pinchout', function(e){
-		$(".dice").velocity("stop", true);
-		$(".dice").each(function(i){
-				$(this).velocity({left:0, width: "100%", borderRadius: 0, top: $("body").height()/5*i, scale: 1}, {complete: function() {pinchin = false;}, duration:200});
-				});
+			e.gesture.preventDefault(true);
+		 	dragInProcess = true;
+		 	
+		 	
+		 	if(kickOff == true) { 
+		 		$(".dice").velocity("stop", true);
+		 		$(".dice").velocity({boxShadowBlur:0}, 0);
+		 		kickOff = false; 
+		 		$(".dice").each(
+		 			function (index) {
+		 				var elem = $(this);
+		 				setTimeout(function(){
+		 					$(elem).velocity({scale:0.8}, {duration:900, easing:[ 600, 20 ]});
+		 				}, index*40);
+		 		});
 				
-	});
+		 	} // end big if
 
-
-
-	$("body").hammer().on('dragdown', function(e){
-
-		if(holding || touched) return; 
-		console.log("Start drag");
-
-	 	e.gesture.preventDefault(true);
-
-	 	globalDrag = true;
-
-	 	if(kickOff == true) { 
-	 		kickOff=false; 
-	 		$(".dice").velocity({scale:0.8}, {duration:900, easing:[ 600, 20 ]});
-	 	}
 
 		}).on("dragend", function(e){
-			if(pinchin) return;
-			if(holding || touched || pinchin) return;
-			console.log("Stop drag");
+			if(!dragInProcess) return; 
+			if(dragUpInProcess) return;
+			if(false) return;
 
+			console.log("released from drag");
 			kickOff = true;
-			globalDrag = false;
+			
 			$(".dice").velocity("stop", true);//.velocity("reverse");
-			$(".dice").velocity({scale: 1, translateX:0, translateY:0}, {easing: [600,20]});
-			$(".dice").each(function(){ $(this).css("background-color", getRandomColor()); $(this).find(".container").html(randomString())});
+			$(".dice").velocity({scale: 1, translateX:0, translateY:0}, {easing: [400,20], complete: function() {dragInProcess = false;}});
+			$(".dice").each(function(){ 
+				var color = getRandomColor();
+				$(this).css("background-color", color); 
+				$(this).find(".ingredient").css("background-color", color);
+				$(this).find(".ingredient").find(".ingredient-text").html(randomIngredient());
+			});
 	});
+
+	//
+	// INDIVIDUAL ELEMENT TOUCH
+	// priority 2 in the event queue
+	//
+
+	var touchInProcess = false;
+	var holdAnim = false;
+	var dragleftInProcess = false;
+	var focused = false;
 
 	$(".dice").hammer().on("touch", function(e) {
-		if(pinchin) return;	
-	 	e.gesture.preventDefault(true);
-		var myElement = $(this);
-		$(this).bringToTop();
-		setTimeout(function(){
-			if(!globalDrag){
-			console.log("touchy > " + $(myElement).html());
-			touched = true;
-			$(myElement).velocity({boxShadowBlur: 50, scale:1.1}, {duration:100});
+		if(collapsedState) return;
+		e.gesture.preventDefault(true);
+
+		var that = $(this);
+
 			
-			}
-		}, 200);
+		setTimeout(function(){
+			if(dragInProcess) return;
+			if(dragUpInProcess) return;
+
+			$(that).bringToTop();
+			
+			$(that).velocity({boxShadowBlur:30}, {duration:2, complete:function(){focused = true;}, begin: function() { foucused = false; touchInProcess = true;}});
+		}, 50);
 		
 	});
 
-	$(".dice").hammer().on("hold", function(ev) { 
-		holding = true;
-		$(this).find(".container").velocity("transition.bounceRightOut", 300).velocity("transition.bounceLeftIn", 300);
-		$(this).find(".container").html(randomString());
+	var refreshElement = false;
+	var rightDrag = false;
+
+	$(".dice").hammer().on("dragleft", function(e){
+		if(dragInProcess) return;
+		if(dragUpInProcess) return;
+		if(collapsedState) return;
+
+		e.gesture.preventDefault();
+		
+		if(!focused) { console.log("aha!"); return; }
+
+		$(this).find(".ingredient").css("left", ($("body").width()*0.4 + e.gesture.deltaX) + "px");
+		$(this).find(".ingredient").velocity({opacity: e.gesture.deltaX.map(0,-190,1,0)}, 1);
+		//$(this).find(".arrow").velocity({opacity: e.gesture.deltaX.map(0,-190,1,0)}, 1);
+
+		if(e.gesture.deltaX < -100)	refreshElement = true; 
 	});
 
-	$(".dice").hammer().on("release", function(ev){
+	$(".dice").hammer().on("dragright", function(e){
+		if(dragInProcess) return;
+		if(dragUpInProcess) return;
+		if(collapsedState) return;
+
+		e.gesture.preventDefault();
 		
-				if(pinchin) return;
-				var myElement = $(this);
+		if(!focused) { console.log("aha!"); return; }
 
-				setTimeout(function(){
-					if(pinchin) return;
-					if(!globalDrag || !pinchin) {
-						if(holding) {
-							holding = false;
-							console.log("released element");
-							$(myElement).css("background-color", getRandomColor());
+		rightDrag = true;
 
-						}
-					if(touched) {
-						console.log("released element from touch");
-						touched = false;
-						$(myElement).velocity("stop", true);
-						$(myElement).velocity({boxShadowBlur: 0, scale:1}, {duration:300});
-					
+		$(this).find(".ingredient").css("left", ($("body").width()*0.4 + e.gesture.deltaX) + "px");
+		$(this).find(".ingredient").velocity({opacity: e.gesture.deltaX.map(0,100,1,0)}, 1);
+		//$(this).find(".arrow").velocity({opacity: e.gesture.deltaX.map(0,-190,1,0)}, 1);
+
+		if(e.gesture.deltaX > 100)	refreshElement = true; 
+	});
+
+	$(".dice").hammer().on("release", function(e){
+				
+				if(dragInProcess) return;
+				if(dragUpInProcess) return;
+				if(collapsedState) return;
+
+				if(false) return;
+
+				if(touchInProcess) {
+					if(!holdAnim) $(this).velocity("stop", true);
+					$(this).velocity({boxShadowBlur: 0}, {duration:300, complete: function() {touchInProcess = false;}});
 				}
-			}
-		}, 200);
+				if(holdAnim) { $(this).velocity({boxShadowBlur: 0, scale:1}, {duration:300, complete: function() {touchInProcess = false;}});}
+
+				if(refreshElement){
+					console.log("refreshingElement");
+					refreshElement = false;
+					$(this).find(".ingredient").css("opacity", "0");
+					$(this).find(".ingredient").css("left", "40%");
+					
+					var color = getRandomColor();
+					console.log(color);
+
+					$(this).find(".ingredient").css("background-color", color); 
+					//$(this).css("backgroundColor",color);
+					$(this).velocity({backgroundColor: color}, {duration: 250});
+
+					$(this).find(".ingredient").find(".ingredient-text").html(randomIngredient());
+					
+					if(rightDrag) { $(this).find(".ingredient").velocity("transition.bounceLeftIn", 600); rightDrag = false; }
+					else $(this).find(".ingredient").velocity("transition.bounceRightIn", 600);
+				}
+				else{
+					if(rightDrag) { $(this).find(".ingredient").velocity({left:"40%", opacity:1}, 200); rightDrag = false; } 
+					else $(this).find(".ingredient").velocity({left:"40%", opacity:1}, 200);
+				}
+
+	
+				//$(this).find(".arrow").velocity("transition.bounceLeftIn", 750);
+				
 	});
 	
 });
