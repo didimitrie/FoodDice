@@ -41,69 +41,30 @@ function getRandomColor() {
 
 function setElementsHeight(){
 	var totalHeight = $("body").height();
-	var unit = totalHeight/9;
-
 	var elemNo = $(".dice").length;
-	var unitD = (totalHeight-unit)/elemNo;
-	
-	$(".dice").each(function(i) { 
-		$(this).height(unitD); 
-		$(this).css("top", i*unitD); 
-	});
 
-	$(".dice").each(function(){
-		$(this).css("background-color", getRandomColor());
-	});
-
-	$(".dice .ingredient").css("line-height", unitD+"px");
-	$(".dice .phrase").css("line-height", unitD+"px");
-	$(".dice .funny-text").css("line-height", unitD+"px");
-
-	$(".menu").height(unit*1);
-	$(".menu").css("line-height", unit*1+"px");
-	//$(".vegToggle").height(unit*1);
-	$(".vegToggle").css("line-height", unit*0.7+"px");
-
-	$(".menu").velocity({boxShadowBlur:10}, 0);
-	//$(".vegToggle").velocity({boxShadowBlur:10}, 0);
-
-	$(".svg-handler").each(function(index){
-		
-
-
-		var skewfactor = index.map(0,3, 10, 15) * (index%2==0 ? 1 : -1);
-		//$(this).velocity({rotateZ: 45}, 1);
-	});
+	$(".dice").each(function(i) { $(this).height((totalHeight-0)/elemNo); $(this).css("top", i*totalHeight/elemNo); });
+	$(".dice .arrow").css("top", totalHeight/(elemNo*2)-30 + "px");
+	$(".dice .ingredient").each(function(){$(this).css("background-color", getRandomColor());});
+	$(".dice .ingredient").css("line-height", totalHeight/elemNo+"px");
+	$(".dice .phrase").css("line-height", totalHeight/elemNo+"px");
+	$(".dice .funny-text").css("line-height", totalHeight/elemNo+"px");
 }
 
+function setUpCards(){
+	var cardNo = $(".card").length;
+	var height = $("body").height();
 
-
-var vegan = false;
-
-function changeRegime()
-{
-	$(".vegToggle").hammer().on("drag", function(e){
-		e.gesture.preventDefault();
-		
-		$(this).velocity({right: "-=" + e.gesture.deltaX.map(0, $("body").width(), 0, 50) + "%"},1)
-		//$(this).css("left", ($("body").width()*0.7 + e.gesture.deltaX) + "px");
-		$(this).velocity({opacity: Math.abs(e.gesture.deltaX).map(0,$("body").width(),1,0)}, 1);
-
+	var totalHeight = $("body").height();
+	$(".card").each(function (index) {
+		$(this).css("top", -index * height + "px");
+		$(this).each(function(){$(this).css("background-color", getRandomColor());});
 	});
-}
-
-function makeMenu()
-{
-	
 }
 
 $(document).ready(function () {
 
 	setElementsHeight();
-
-	makeMenu();
-
-	changeRegime();
 
 	var kickOff = true;
 	var kickOffUp = true;
@@ -117,10 +78,52 @@ $(document).ready(function () {
 	var sidebardDragRight = false;
 	var sideBarScale = 0;
 
-	//
-	// VEGETARIAN TOGGLE
-	// no interaction conflicts for now
-	//
+
+	$("body").hammer().on('dragright', function(e) {
+		$(this).bringToTop();
+		e.gesture.preventDefault(true);
+		sidebardDragLeft = true;
+		var scale = e.gesture.deltaX.map(0, $("body").width(), 12, 100);
+		$(".collection").css("width", scale + "%");
+		$(".dc").css("left", scale*0.7 + "%");
+		$(".dc").velocity({rotateX:scale*0.8, opacity:1-scale/100}, 0);
+		sideBarScale = scale;
+	}).on('release', function(){
+		if(!sidebardDragLeft) return;
+		sidebardDragLeft = false;
+		if(sideBarScale>50) {
+			$(".collection").velocity({width:"100%"}, {duration: 300, easing: "easeOutCubic", complete:function(){sidebarOpen = true;}});
+			$(".dc").velocity({left:"100%", rotateX: 90}, {duration: 300, easing: "easeOutCubic"});
+		}
+		else{ 
+			$(".collection").velocity({width:"10%"}, {duration: 300, easing: "easeOutCubic"});
+			$(".dc").velocity({left:"0%", rotateX:0, opacity:1}, {duration: 300, easing: "easeOutCubic"});
+		}
+	});
+
+	$(".collection").hammer().on('dragleft', function(e){
+		e.gesture.preventDefault(true);
+		if(!sidebarOpen) return;
+		var scale = 100-e.gesture.deltaX.map(0, -$("body").width(), 12, 100);
+		$(this).css("width", scale + "%");
+		$(".dc").css("left", scale*0.35 + "%");
+		$(".dc").velocity({rotateX:scale*0.8, opacity:1-scale/100}, 0);
+
+		sideBarScale = scale;
+		sidebardDragRight = true;
+	}).on('release', function(){
+		if(!sidebardDragRight) return;
+		if(sideBarScale<50) 
+		{
+			$(".collection").velocity({width:"10%"}, {duration: 100, complete:function(){sidebarOpen = false;}});
+			$(".dc").velocity({left:"0%", rotateX:0, opacity:1}, 100);
+		}
+		else
+		{ 
+			$(".collection").velocity({width:"100%"}, 100);
+			$(".dc").velocity({left:"100%", rotateX: 90}, 100);
+		}
+	});
 
 
 	//
@@ -168,12 +171,7 @@ $(document).ready(function () {
 			
 			$(".dice").velocity("stop", true);//.velocity("reverse");
 			$(".dice").velocity({scale: 1, translateX:0, translateY:0}, {easing: [400,20], complete: function() {dragInProcess = false;}});
-			$(".dice").each(function(){ 
-				var color = getRandomColor();
-				$(this).css("background-color", color); 
-				$(this).find(".ingredient").css("background-color", color);
-				$(this).find(".ingredient").find(".ingredient-text").html(randomIngredient());
-			});
+			$(".dice").each(function(){ $(this).find(".ingredient").css("background-color", getRandomColor()); $(this).find(".ingredient").html(randomIngredient())});
 	});
 
 	//
@@ -198,7 +196,7 @@ $(document).ready(function () {
 
 			$(that).bringToTop();
 			
-			$(that).velocity({boxShadowBlur:30}, {duration:2, complete:function(){focused = true;}, begin: function() { foucused = false; touchInProcess = true;}});
+			$(that).velocity({boxShadowBlur:30, scale:1.1}, {duration:2, complete:function(){focused = true;}, begin: function() { foucused = false; touchInProcess = true;}});
 		}, 50);
 		
 	});
@@ -206,7 +204,7 @@ $(document).ready(function () {
 	var refreshElement = false;
 	var rightDrag = false;
 
-	$(".dice").hammer().on("dragleft", function(e){
+	$(".dice ").hammer().on("dragleft", function(e){
 		if(dragInProcess) return;
 		if(dragUpInProcess) return;
 		if(collapsedState) return;
@@ -215,29 +213,12 @@ $(document).ready(function () {
 		
 		if(!focused) { console.log("aha!"); return; }
 
-		$(this).find(".ingredient").css("left", ($("body").width()*0.4 + e.gesture.deltaX) + "px");
+		$(this).find(".ingredient").css("left", ($("body").width()/2 + e.gesture.deltaX) + "px");
 		$(this).find(".ingredient").velocity({opacity: e.gesture.deltaX.map(0,-190,1,0)}, 1);
-		//$(this).find(".arrow").velocity({opacity: e.gesture.deltaX.map(0,-190,1,0)}, 1);
+		$(this).find(".funny-text").velocity({opacity: e.gesture.deltaX.map(0,-120,0,1)}, 1);
+		$(this).find(".arrow").velocity({opacity: e.gesture.deltaX.map(0,-190,1,0)}, 1);
 
 		if(e.gesture.deltaX < -100)	refreshElement = true; 
-	});
-
-	$(".dice").hammer().on("dragright", function(e){
-		if(dragInProcess) return;
-		if(dragUpInProcess) return;
-		if(collapsedState) return;
-
-		e.gesture.preventDefault();
-		
-		if(!focused) { console.log("aha!"); return; }
-
-		rightDrag = true;
-
-		$(this).find(".ingredient").css("left", ($("body").width()*0.4 + e.gesture.deltaX) + "px");
-		$(this).find(".ingredient").velocity({opacity: e.gesture.deltaX.map(0,100,1,0)}, 1);
-		//$(this).find(".arrow").velocity({opacity: e.gesture.deltaX.map(0,-190,1,0)}, 1);
-
-		if(e.gesture.deltaX > 100)	refreshElement = true; 
 	});
 
 	$(".dice").hammer().on("release", function(e){
@@ -250,7 +231,7 @@ $(document).ready(function () {
 
 				if(touchInProcess) {
 					if(!holdAnim) $(this).velocity("stop", true);
-					$(this).velocity({boxShadowBlur: 0}, {duration:300, complete: function() {touchInProcess = false;}});
+					$(this).velocity({boxShadowBlur: 0, scale:1}, {duration:300, complete: function() {touchInProcess = false;}});
 				}
 				if(holdAnim) { $(this).velocity({boxShadowBlur: 0, scale:1}, {duration:300, complete: function() {touchInProcess = false;}});}
 
@@ -258,27 +239,18 @@ $(document).ready(function () {
 					console.log("refreshingElement");
 					refreshElement = false;
 					$(this).find(".ingredient").css("opacity", "0");
-					$(this).find(".ingredient").css("left", "40%");
-					
-					var color = getRandomColor();
-					console.log(color);
-
-					$(this).find(".ingredient").css("background-color", color); 
-					//$(this).css("backgroundColor",color);
-					$(this).velocity({backgroundColor: color}, {duration: 250});
-
-					$(this).find(".ingredient").find(".ingredient-text").html(randomIngredient());
-					
+					$(this).find(".ingredient").css("left", "50%");
+					$(this).find(".ingredient").css("background-color", getRandomColor()); $(this).find(".ingredient").html(randomIngredient());
 					if(rightDrag) { $(this).find(".ingredient").velocity("transition.bounceLeftIn", 600); rightDrag = false; }
 					else $(this).find(".ingredient").velocity("transition.bounceRightIn", 600);
 				}
 				else{
-					if(rightDrag) { $(this).find(".ingredient").velocity({left:"40%", opacity:1}, 200); rightDrag = false; } 
-					else $(this).find(".ingredient").velocity({left:"40%", opacity:1}, 200);
+					if(rightDrag) { $(this).find(".ingredient").velocity({left:"50%", opacity:1}, 200); rightDrag = false; } 
+					else $(this).find(".ingredient").velocity({left:"50%", opacity:1}, 200);
 				}
 
-	
-				//$(this).find(".arrow").velocity("transition.bounceLeftIn", 750);
+				$(this).find(".funny-text").velocity({opacity: 0}, 200);
+				$(this).find(".arrow").velocity("transition.bounceLeftIn", 750);
 				
 	});
 	
