@@ -191,6 +191,7 @@ $(document).ready(function () {
 		e.gesture.preventDefault(true);
 
 		var that = $(this);
+
 			
 		setTimeout(function(){
 			if(dragInProcess) return;
