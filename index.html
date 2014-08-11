@@ -10,11 +10,12 @@
     <link href="/css/style.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Raleway:200,400,900' rel='stylesheet' type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Droid+Serif:400italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Roboto:100italic' rel='stylesheet' type='text/css'>
   </head>
 
   <body>  
    <div id="dice-holder">
-
+   <div class="dice-set">
         <div id="dice-0" class="dice swipeable">
         <div class="phrase">Go ahead and</div>
         <div class="ingredient swiper">
@@ -28,34 +29,29 @@
          <div class="ingredient swiper">
          <div class="svg-handler"></div>
           <div class="ingredient-text">some</div>
-
          </div>
         </div>
-
+        
         <div id="dice-2" class="dice swipeable">
         <div class="phrase">with a side of</div>
          <div class="ingredient swiper">
          <div class="svg-handler"></div>
                  <div class="ingredient-text">stuff</div>
-
          </div>
         </div>
 
-        <div id="dice-3" class="dice swipeable">
-        <div class="phrase">and a dash of</div>
-         <div class="ingredient swiper">
-         <div class="svg-handler"></div>
-         <div class="ingredient-text">stuff</div>
-         </div>
-        </div>   
+
+  </div>    
   </div>
 
   <div id="menu-holder">
-    <div class="vegToggle swipeable">
-    
-      <div class="swiper vegger">  I like meat. </div>
-    
-    </div>
+  <div class="inner-holder">
+    <div class="title active">Delightful Dinner</div>
+    <div class="title">Paradise Desert</div>
+    <div class="title">Happy Veggies</div>
+    <div class="title">Monstrous Meat</div> 
+    <div class="title">Sleek Apero</div> 
+  </div>
   </div>
 
  
@@ -69,6 +65,7 @@
     <!-- Hammer JS -->
     <script src="/bower_components/hammerjs/hammer.min.js"></script>
     <script src="/bower_components/jquery-hammerjs/jquery.hammer-full.min.js"></script>
+  
     <!-- Our little javascript file -->
     <script src="/js/scripts.js"></script>
 

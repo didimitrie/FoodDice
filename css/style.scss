@@ -1,9 +1,10 @@
 
 $font : 'Raleway', sans-serif;
+$curlyFont : 'Roboto', sans-serif;
 $bgColor : #d7d7d7;
 
 $mainHeight : 90%;
-$menuHeight : 10%;
+$menuHeight : 100%;
 
 body,
 html {
@@ -29,6 +30,12 @@ body{
   height: $mainHeight;
 }
 
+.dice-set{
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .dice {
   position: relative;
   background-color: white;
@@ -45,73 +52,81 @@ body{
 .phrase{
   font-family: $font;
   color: #ffffff;
-  position: relative;
-  width: 40%;
-  height: 100%;
-  text-align: right;
+  position: absolute;
+  width: 100%;
+  height: 20%;
+  text-align: center;
   font-weight: 200;
-  top:0;
+  top:10%;
   left:0%;
-  font-size: 4.2vw;
+  font-size: 4vw;
+  font-style: italic;
   display: inline-block;
-  float:left;
+  float:left; 
+  z-index: 20;
 }
 
 .ingredient {
-  position: relative;
+  position: absolute;
+  top: 30%;
+  width: 100%;
+  height: 70%;
+
   text-align: center;
+  font-size: 6.5vw;
   color: white;
-  width: 60%;
-  height: 100%;
   font-weight: 100;
   text-transform: uppercase;
-  top:0px;
 
-  font-size: 25px;
-  line-height: 100px;
   overflow: hidden;
 }
 
 .svg-handler {
   position: absolute;
   top:25%;
-  left: 12.5%;
+  left: 20%;
   height: 50%;
-  width: 75%;
-
-  border: 1px solid white;
+  width: 60%;
+  border-bottom: 1px dashed white;
   z-index: 100;
 }
 
 #menu-holder{
-  position: absolute;
+  font-size: 6vw;
+  text-align: center;
+  font-weight: 200;
+  text-transform: uppercase;
+
+  position: relative;
   top: $mainHeight;
   left:0;
   width: 100%;
   height: $menuHeight;
-  background-color: #7f7f7f;
+  background-color: white;
   color: white;
   overflow: hidden;
-  z-index: 997;
-}
-
-.vegToggle {
-  position: relative;
-  left:0%;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
   z-index: 999;
-  font-size: 3vw;
+
+  .inner-holder {
+    position: absolute;
+    overflow: scroll;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    margin: 0 auto;
+    top: 0%;
+  }
+
+  .title {
+    position: relative;
+    width: 100%;
+    height: 25%;
+    margin: 0 auto;
+  }
+
+  .title.active {
+    font-weight: 900;
+    box-shadow: 0px 0px 35px 0px rgba(50, 50, 50, 1);
+  }
 }
-
-.vegger {
-  height: 100%;
-  width: 100%;
-  position: relative;
-  left:0;
-  text-align: center;
-}
-
-
 
